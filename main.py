@@ -45,11 +45,17 @@ class Bot(commands.Bot):
             pass
 
     def read_token(self):
+        self.token = None
         try:
             with open('./token.txt','r') as fp:
                 self.token = fp.readlines()[0].strip('\n')
         except:
-            self.token = None
+            pass
+        try:
+            if self.token is None:
+                with open('./mikubot/token.txt','r') as fp:
+                    self.token = fp.readlines()[0].strip('\n')
+        except:
             print("Token file not found")
 
     async def on_ready(self):
@@ -61,7 +67,9 @@ class Bot(commands.Bot):
 
     async def on_message(self, message):
         # this function is executed when a message is recieved
-
+        if message.author == self.user:
+            # ignore yourself
+            return
         # turn the whole message lowercase
         contents = message.clean_content.lower()
         contents.split(' ')
