@@ -1,12 +1,13 @@
 # anti homestuck bot for gwens server
 # author Nicky (@starmaid#6925)
 # created 03/21/2020
-# edited 03/21/2020
-# version 1.0.0
+# edited 04/12/2020
+# version 1.1.0
 
 import discord
 from discord.ext import commands
 import random
+from random import choice
 
 class Bot(commands.Bot):
     phrases = [
@@ -17,17 +18,17 @@ class Bot(commands.Bot):
         'its me, miku!',
         '\\*peace signs\\*'
     ]
-    homestuck = [
-        'homestuck',
-        'hs',
-        'vriska',
-        'terezi',
-        'karkat'
-    ]
+    x1 = []
+    x2 = []
     hs_replies = [
         'STOP THAT',
         'STOP DEFILING THIS CHAT',
         '\\*smacks you over the head\\*'
+    ]
+    suspicious = [
+        '\\*eyes you suspiciously\\*',
+        'hmmmm....',
+        'watch ur back bucko...'
     ]
     activity = 'viddy gaem'
     logoff_msg = 'logging off :3'
@@ -39,6 +40,19 @@ class Bot(commands.Bot):
         self.quit_val = random.randint(100000000000,999999999999)
         self.remove_command('help')
         self.read_token()
+
+        with open('./x1.txt','r') as f:
+            line = f.readline()
+            while line is not '':
+                self.x1.append(line.replace('\n',''))
+                line = f.readline()
+
+        with open('./x2.txt','r') as f:
+            line = f.readline()
+            while line is not '':
+                self.x2.append(line.replace('\n',''))
+                line = f.readline()
+
         if self.token is not None:
             super().run(self.token)
         else:
@@ -71,8 +85,7 @@ class Bot(commands.Bot):
             # ignore yourself
             return
         # turn the whole message lowercase
-        contents = message.clean_content.lower()
-        contents.split(' ')
+        contents = message.clean_content.lower().split(' ')
         # finds where the message came from
         channel = message.channel
 
@@ -80,17 +93,42 @@ class Bot(commands.Bot):
         for phrase in self.phrases:
             if phrase in contents:
                 # replies with a generated keysmash
-                await channel.send(self.replies[random.randint(0,len(self.replies)-1)])
+                await channel.send(choice(self.replies))
                 return
 
         if str(channel.name) != 'h-mestuck':
-            for h in self.homestuck:
-                if h in contents:
-                    await channel.send(self.hs_replies[random.randint(0,len(self.hs_replies)-1)])
+            for w in contents:
+                if w in self.x1:
+                    wlist = []
+                    wlist.append(w)
+                    await channel.send(self.gen_reply(wlist, 1))
+                    return
+            l = 0
+            wlist = []
+            for w in contents:
+                if w in self.x2:
+                    print(w + ' ' + str(l))
+                    wlist.append(w)
+                    l = l + 1
+            if l >= 2:
+                await channel.send(self.gen_reply(wlist, 2))
 
         if str(self.quit_val) in contents:
             await channel.send(self.logoff_msg)
             await self.close()
+
+    def gen_reply(self, words, type):
+        msg = 'u said'
+        for w in words:
+            msg = msg + ' `'  + w + '`'
+            if w != words[len(words) - 1]:
+                msg = msg + ', '
+        msg = msg + ' - '
+        if type == 1:
+            msg = msg + choice(self.hs_replies)
+        elif type == 2:
+            msg = msg + choice(self.suspicious)
+        return msg
 
 
 if __name__ == '__main__':
