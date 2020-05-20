@@ -1,10 +1,9 @@
-# destiny assistant bot for my destiny server
+# miku bot
 # this one chekcs rss feeds and is meant to run like once every 15 min
 # author Nicky (@starmaid#6925)
-# created 05/07/2020
+# created 05/20/2020
 # edited 05/20/2020
-# version 1.1
-# fixed xur location. xurlok is not maintained anymore. understandable tho
+# version 1.0
 
 import feedparser
 import requests
